@@ -1,0 +1,79 @@
+aws:
+  region: us-east-1
+
+cluster:
+  name: eks_apigateway
+  type: managed
+  kubernetes_version: "1.36"
+  endpoint:
+    public_access: true
+    private_access: false
+
+network:
+  create_vpc: true
+  vpc:
+    cidr: "10.10.0.0/16"
+  availability_zones:
+    - ap-south-2a
+    - ap-south-2b
+  public_subnets:
+    - "10.10.101.0/24"
+    - "10.10.102.0/24"
+  private_subnets:
+    - "10.10.1.0/24"
+    - "10.10.2.0/24"
+  nat_gateway:
+    enabled: true
+    mode: single
+
+iam:
+  cluster:
+    create: true
+    name: dev-eks-cluster-role
+  node:
+    create: true
+    name: dev-eks-node-role
+
+node_groups:
+  system:
+    instance_types:
+      - t3.medium
+    capacity_type: ON_DEMAND
+    min_size: 2
+    desired_size: 2
+    max_size: 3
+    disk_size: 50
+    labels:
+      node-type: system
+
+  application:
+    instance_types:
+      - t3.large
+    capacity_type: ON_DEMAND
+    min_size: 2
+    desired_size: 2
+    max_size: 5
+    disk_size: 100
+    labels:
+      node-type: application
+
+addons:
+  vpc_cni:
+    enabled: true
+  coredns:
+    enabled: true
+  kube_proxy:
+    enabled: true
+  pod_identity:
+    enabled: true
+  ebs_csi:
+    enabled: true
+
+security:
+  encryption:
+    enabled: false
+
+tags:
+  Environment: dev
+  Project: eks
+  ManagedBy: terraform
